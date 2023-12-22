@@ -1,6 +1,7 @@
 import type { Address } from 'abitype'
 
 import type { Chain } from '../../../types/chain.js'
+import type { Prettify } from '../../../types/utils.js'
 import type { TargetChain } from './chain.js'
 
 export type GetContractAddressParameter<
@@ -8,10 +9,19 @@ export type GetContractAddressParameter<
   contractName extends string,
 > =
   | (chain extends Chain
-      ? {
-          [_key in `${contractName}Address`]?: undefined
-        } & { targetChain: TargetChain<chain, contractName> }
+      ? Prettify<
+          {
+            targetChain: Prettify<TargetChain<chain, contractName>>
+            foo?: chain
+          } & {
+            [_ in `${contractName}Address`]?: undefined
+          }
+        >
       : never)
-  | ({
-      [_key in `${contractName}Address`]: Address
-    } & { targetChain?: undefined })
+  | Prettify<
+      {
+        targetChain?: undefined
+      } & {
+        [_ in `${contractName}Address`]: Address
+      }
+    >

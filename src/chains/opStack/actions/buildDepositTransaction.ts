@@ -62,13 +62,18 @@ export type BuildDepositTransactionParameters<
   )
 
 export type BuildDepositTransactionReturnType<
+  chain extends Chain | undefined = Chain | undefined,
   account extends Account | undefined = Account | undefined,
+  chainOverride extends Chain | undefined = Chain | undefined,
   accountOverride extends Account | Address | undefined =
     | Account
     | Address
     | undefined,
 > = Prettify<
-  UnionOmit<DepositTransactionParameters<Chain, account, Chain>, 'account'> & {
+  UnionOmit<
+    DepositTransactionParameters<chain, account, chainOverride>,
+    'account'
+  > & {
     account: DeriveAccount<account, accountOverride>
   }
 >
@@ -117,7 +122,14 @@ export async function buildDepositTransaction<
     chainOverride,
     accountOverride
   >,
-): Promise<BuildDepositTransactionReturnType<account, accountOverride>> {
+): Promise<
+  BuildDepositTransactionReturnType<
+    chain,
+    account,
+    chainOverride,
+    accountOverride
+  >
+> {
   const {
     account: account_,
     chain = client.chain,
@@ -152,5 +164,10 @@ export async function buildDepositTransaction<
       value: request.value,
     },
     targetChain: chain,
-  } as unknown as BuildDepositTransactionReturnType<account, accountOverride>
+  } as unknown as BuildDepositTransactionReturnType<
+    chain,
+    account,
+    chainOverride,
+    accountOverride
+  >
 }
